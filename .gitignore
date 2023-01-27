@@ -1,0 +1,19 @@
+/_build/
+
+/cover/
+
+/deps/
+
+/doc/
+
+/.fetch
+
+erl_crash.dump
+
+*.ez
+
+# Tools.
+.elixir_ls/
+
+# Mac
+*.DS_Store
