@@ -8,7 +8,8 @@ defmodule Distributed.Main do
   @impl true
   def init(_init_arg) do
     children = [
-      Distributed.Router
+      Distributed.Router,
+      Distributed
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

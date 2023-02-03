@@ -3,7 +3,17 @@ defmodule Distributed do
   Documentation for `Distributed`.
   """
 
+  use GenServer
   alias Distributed.Router
+
+  def start_link(_) do
+    GenServer.start_link(__MODULE__, [], name: __MODULE__)
+  end
+
+  @impl true
+  def init(_) do
+    {:ok, []}
+  end
 
   @doc """
   Run calc fib function on remote node
@@ -17,28 +27,31 @@ defmodule Distributed do
 
   @spec calc_fib(non_neg_integer()) :: {non_neg_integer(), atom()}
   def calc_fib(num \\ 5) do
+    GenServer.call(__MODULE__, {:calc_fib, num})
+  end
+
+  @impl true
+  def handle_call({:calc_fib, num}, _from, state) do
     next = GenServer.call(Router, :take_node)
 
     next_node =
-      cond do
-        next == node() -> GenServer.call(Router, :take_node)
-        true -> next
+      case node() do
+        ^next -> GenServer.call(Router, :take_node)
+        _ -> next
       end
 
-    pid =
-      Node.spawn_link(next_node, fn ->
-        receive do
-          {:calc, client, num} -> send(client, {:reply, fib(num), node()})
-        end
-      end)
-
-    send(pid, {:calc, self(), num})
+    Node.spawn(next_node, __MODULE__, :fib, [num, self()])
 
     receive do
       {:reply, calculated, node_name} ->
         IO.puts("Fibonacci number was calculated, and reply got from node: #{node_name}")
-        {calculated, node_name}
+        {:reply, {calculated, node_name}, state}
     end
+  end
+
+  def fib(num, pid) do
+    calced = fib(num)
+    send(pid, {:reply, calced, node()})
   end
 
   def fib(0), do: 0
