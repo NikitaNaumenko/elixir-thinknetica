@@ -20,7 +20,6 @@ defmodule Wc do
 
     lines = trimed_content |> String.split("\n")
 
-    
     lines
     |> Stream.with_index(1)
     |> Stream.map(fn {line, line_number} ->

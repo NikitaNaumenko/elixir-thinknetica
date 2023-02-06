@@ -3,7 +3,7 @@ defmodule Wc.Worker do
 
   def start_link(line_number) do
     DynamicSupervisor.start_child(
-      {:via, Registry, {Wc.Workers, line_number}},
+      Wc.Workers.Supervisor,
       %{
         id: GenServer,
         start:
@@ -11,16 +11,6 @@ defmodule Wc.Worker do
            [__MODULE__, {0, 0, 0}, [name: {:via, Registry, {Wc.Workers, line_number}}]]}
       }
     )
-
-    # DynamicSupervisor.start_child(
-    #   {:via, PartitionSupervisor, {{:via, Registry, {ExBf.Sessions, id}}, idx}},
-    #   %{
-    #     id: GenServer,
-    #     start:
-    #       {GenServer, :start_link,
-    #        [__MODULE__, 0, [name: {:via, Registry, {ExBf.Cells, {id, idx}}}]]}
-    #   }
-    # )
   end
 
   @impl true
