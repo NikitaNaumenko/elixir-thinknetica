@@ -8,7 +8,8 @@ defmodule Wc.Worker do
         id: GenServer,
         start:
           {GenServer, :start_link,
-           [__MODULE__, {0, 0, 0}, [name: {:via, Registry, {Wc.Workers, line_number}}]]}
+           [__MODULE__, {0, 0, 0}, [name: {:via, Registry, {Wc.Workers, line_number}}]]},
+        restart: :transient
       }
     )
   end
@@ -21,12 +22,19 @@ defmodule Wc.Worker do
   @impl true
   def handle_cast({:count, line}, _state) do
     words = String.split(line, " ")
-    # Compesate new line byte
-    {:noreply, {1, Enum.count(words), byte_size(line) + 1}}
+    {:noreply, {1, Enum.count(words), byte_size(line)}}
   end
 
   @impl true
   def handle_call(:result, _from, state) do
-    {:reply, state, state}
+    # {:reply, state, state}
+    {:stop, :normal, state, state}
   end
+
+  # @impl true
+  # def handle_call(:stop, _from, state) do
+  #   {:stop, :normal, state, state}
+  #   # {:reply, state, state}
+  # end
+
 end
