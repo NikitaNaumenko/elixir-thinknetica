@@ -3,62 +3,103 @@ defmodule Ferryboat do
   Documentation for `Ferryboat`.
   """
 
-  alias Ferryboat.{Passenger, LeftCoast, RightCoast}
+  alias Ferryboat.{Passenger, State}
 
   @goat %Passenger{self: "goat", enemies: ["wolf", "cabbage"]}
   @wolf %Passenger{self: "wolf", enemies: ["goat"]}
   @cabbage %Passenger{self: "cabbage", enemies: ["goat"]}
+  @initial_left_coast [@goat, @cabbage, @wolf]
+  @state %State{
+    coasts: %{left: @initial_left_coast, right: []},
+    direction: :left,
+    history: [@initial_left_coast]
+  }
 
   @doc """
-  Hello world.
+  Transit animals and alone vegetable
 
   ## Examples
 
-      iex> Ferryboat.hello()
-      :world
-
+      iex> Ferryboat.main()
+      [
+        ["🐐", "🥬", "🐺"],
+        ["🥬", "🐺"],
+        ["🐺"],
+        ["🐐", "🐺"],
+        ["🐐"],
+        [],
+        ["🐐", "🥬", "🐺"],
+        ["🥬", "🐺"],
+        ["🥬"],
+        ["🐐", "🥬"],
+        ["🐐"],
+        [],
+        ["🐐", "🥬", "🐺"],
+        ["🥬", "🐺"],
+        ["🥬"],
+        ["🐺", "🥬"],
+        ["🐺"],
+        ["🐐", "🐺"],
+        ["🐐"],
+        []
+       ]
   """
+
+  @spec main() :: [[binary()]]
   def main() do
-    left_state = ["goat", "cabbage", "wolf"]
-    right_state = []
-    history = []
-    do_transit(left_state, right_state, history)
+    transit(@state) |> Enum.to_list()
   end
 
-  def do_transit([], _right_state, history), do: history
+  @spec transit(state :: State.t()) :: Enumerable.t()
+  def transit(state) do
+    case state.coasts.left do
+      [] ->
+        state.history
+        |> Enum.reverse()
+        |> Enum.map(fn h -> Enum.map(h, &to_string/1) end)
 
-  def do_transit([passenger | left], right, history) do
-    case check?(left) do
-      false ->
-        do_transit(left ++ [passenger], right, history)
-
-      true ->
-        right = right ++ [passenger]
-        IO.puts("[#{Enum.join(left, ",")}]\n #{passenger} -->\n #{Enum.join(right, ",")}")
-
-        case check?(right) do
-          true ->
-            do_transit(left, right, [%{left: left, right: right, passenger: passenger}])
-
-          false ->
-            [passenger | right] = right
-
-            IO.puts(
-              "[#{Enum.join(left ++ [passenger], ",")}]\n <-- #{passenger} \n [#{Enum.join(tl(right), ",")}]"
-            )
-
-            do_transit(left ++ [passenger], right, history)
-        end
+      _rest ->
+        [nil | @initial_left_coast]
+        |> Task.async_stream(&do_transit(state, &1))
+        |> Stream.map(&elem(&1, 1))
+        |> Stream.filter(& &1)
+        |> Stream.flat_map(&transit/1)
     end
   end
 
+  @spec do_transit(state :: State.t(), elem :: nil | Passenger.t()) :: State.t()
+  def do_transit(%State{coasts: coasts, direction: direction, history: history} = state, nil) do
+    with true <- direction == :right,
+         true <- check?(coasts[:right]) do
+      %State{
+        state
+        | direction: :left,
+          history: history
+      }
+    end
+  end
+
+  def do_transit(%State{coasts: coasts, direction: direction, history: history}, elem) do
+    [coast1, coast2] = if direction == :left, do: [:left, :right], else: [:right, :left]
+
+    with true <- elem in coasts[direction],
+         coasts = %{coast1 => coasts[coast1] -- [elem], coast2 => [elem | coasts[coast2]]},
+         new_state = coasts[:left],
+         true <- check?(coasts[direction]),
+         true <- not Enum.member?(history, new_state) do
+      %State{
+        coasts: coasts,
+        direction: coast2,
+        history: [new_state | history]
+      }
+    end
+  end
+
+  @spec check?(list()) :: boolean()
   def check?(state) do
-    case state do
-      ["goat", "cabbage"] -> false
-      ["cabbage", "goat"] -> false
-      ["wolf", "goat"] -> false
-      ["goat", "wolf"] -> false
-      _ -> true
-    end
+    selves = state |> Enum.map(& &1.self) |> MapSet.new()
+    enemies = state |> Enum.flat_map(& &1.enemies) |> MapSet.new()
+
+    MapSet.disjoint?(selves, enemies)
   end
 end
