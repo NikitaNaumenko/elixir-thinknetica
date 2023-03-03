@@ -1,0 +1,63 @@
+<.header>
+  Listing Meetings
+  <:actions>
+    <.link patch={~p"/meetings/new"}>
+      <.button>New Meeting</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.simple_form for={@form} method="get" action={~p"/meetings/"} id="search-form" phx-submit="search">
+  <.input field={@form[:name]} type="text" label="Name" />
+  <.input field={@form[:scheduled_at]} type="date" label="Scheduled at" />
+  <:actions>
+    <.button phx-disable-with="Searching...">Search Meeting</.button>
+  </:actions>
+</.simple_form>
+
+  <%!-- row_click={fn {_id, meeting} -> JS.navigate(~p"/meetings/#{meeting}") end} --%>
+  <%!-- <:col :let={{_id, meeting}} label="Name"><%= meeting.name %></:col> --%>
+  <%!-- <:col :let={{_id, meeting}} label="Scheduled at"><%= meeting.scheduled_at %></:col> --%>
+  <%!-- <:col :let={{_id, meeting}} label="Invited users"> --%>
+
+<.table
+  id="meetings"
+  rows={@meetings}
+  row_click={fn meeting -> JS.navigate(~p"/meetings/#{meeting}") end}
+>
+  <:col :let={meeting} label="Name"><%= meeting.name %></:col>
+  <:col :let={meeting} label="Scheduled at"><%= meeting.scheduled_at %></:col>
+  <:col :let={ meeting} label="Invited users">
+    <%= Enum.map_join(meeting.users, ",", & &1.username) %>
+  </:col>
+  <:action :let={meeting}>
+    <div class="sr-only">
+      <.link navigate={~p"/meetings/#{meeting}"}>Show</.link>
+    </div>
+    <.link patch={~p"/meetings/#{meeting}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={meeting}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: meeting.id}) |> hide("##{meeting.id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="meeting-modal"
+  show
+  on_cancel={JS.navigate(~p"/meetings")}
+>
+  <.live_component
+    module={HomeworkWeb.MeetingLive.FormComponent}
+    id={@meeting.id || :new}
+    title={@page_title}
+    action={@live_action}
+    meeting={@meeting}
+    patch={~p"/meetings"}
+  />
+</.modal>
