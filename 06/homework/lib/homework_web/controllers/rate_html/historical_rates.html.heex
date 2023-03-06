@@ -1,0 +1,11 @@
+<.header>
+  Historical rates by <%= @date %>
+  <:actions>
+    <.link navigate={~p"/historical_rates/#{@previous_date}"}>Previous</.link>
+    <.link navigate={~p"/historical_rates/#{@next_date}"}>Next</.link>
+  </:actions>
+</.header>
+<.table id="rates" rows={@rates}>
+  <:col :let={rate} label="ISO code"><%= rate.iso_code %></:col>
+  <:col :let={rate} label="Rate"><%= rate.rate %></:col>
+</.table>

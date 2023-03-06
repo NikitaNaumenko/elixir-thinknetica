@@ -1,0 +1,8 @@
+<.header>
+  Latest Rates
+</.header>
+
+<.table id="rates" rows={@rates}>
+  <:col :let={rate} label="ISO code"><%= rate.iso_code %></:col>
+  <:col :let={rate} label="Rate"><%= rate.rate %></:col>
+</.table>
