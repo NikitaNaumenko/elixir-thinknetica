@@ -31,7 +31,6 @@ defmodule HomeworkWeb.MeetingLive.FormComponent do
         </.inputs_for>
         <button type="button" phx-click="add-user" phx-target={@myself}>Add</button>
 
-
         <:actions>
           <.button phx-disable-with="Saving...">Save Meeting</.button>
         </:actions>
@@ -62,7 +61,10 @@ defmodule HomeworkWeb.MeetingLive.FormComponent do
 
   def handle_event("add-user", _, socket) do
     user_meeting = %Homework.Users.Meeting{} |> Homework.Users.Meeting.changeset(%{})
-    user_meetings = Map.get(socket.assigns.form.source.changes, :user_meetings, []) ++ [user_meeting]
+
+    user_meetings =
+      Map.get(socket.assigns.form.source.changes, :user_meetings, []) ++ [user_meeting]
+
     changeset =
       socket.assigns.form.source
       |> Map.put(:changes, %{user_meetings: user_meetings})

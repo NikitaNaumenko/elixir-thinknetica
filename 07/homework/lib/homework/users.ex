@@ -17,6 +17,7 @@ defmodule Homework.Users do
       [%User{}, ...]
 
   """
+  @spec list_users() :: [User.t()]
   def list_users do
     Repo.all(User)
   end
@@ -35,6 +36,7 @@ defmodule Homework.Users do
       ** (Ecto.NoResultsError)
 
   """
+  @spec get_user!(non_neg_integer()) :: User.t()
   def get_user!(id), do: Repo.get!(User, id)
 
   @doc """
@@ -49,6 +51,7 @@ defmodule Homework.Users do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec create_user(map()) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   def create_user(attrs \\ %{}) do
     %User{}
     |> User.changeset(attrs)
@@ -67,6 +70,8 @@ defmodule Homework.Users do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec update_user(user :: User.t(), attrs :: map()) ::
+          {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   def update_user(%User{} = user, attrs) do
     user
     |> User.changeset(attrs)
@@ -85,6 +90,7 @@ defmodule Homework.Users do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec delete_user(User.t()) :: {:ok, User.t()} | {:error, Ecto.Changeset.t()}
   def delete_user(%User{} = user) do
     Repo.delete(user)
   end
@@ -98,6 +104,7 @@ defmodule Homework.Users do
       %Ecto.Changeset{data: %User{}}
 
   """
+  @spec change_user(user :: User.t(), attrs :: map()) :: Ecto.Changeset.t()
   def change_user(%User{} = user, attrs \\ %{}) do
     User.changeset(user, attrs)
   end

@@ -18,7 +18,7 @@ defmodule HomeworkWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
-    
+
     live "/users", UserLive.Index, :index
     live "/users/new", UserLive.Index, :new
     live "/users/:id/edit", UserLive.Index, :edit
@@ -26,7 +26,7 @@ defmodule HomeworkWeb.Router do
     live "/users/:id", UserLive.Show, :show
     live "/users/:id/show/edit", UserLive.Show, :edit
 
-        live "/meetings", MeetingLive.Index, :index
+    live "/meetings", MeetingLive.Index, :index
     live "/meetings/new", MeetingLive.Index, :new
     live "/meetings/:id/edit", MeetingLive.Index, :edit
 

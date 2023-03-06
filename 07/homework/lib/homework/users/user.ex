@@ -3,6 +3,8 @@ defmodule Homework.Users.User do
   import Ecto.Changeset
 
   alias Homework.Meetings.Meeting
+
+  @type t :: %__MODULE__{}
   schema "users" do
     field :username, :string
     many_to_many :meetings, Meeting, join_through: "user_meetings"

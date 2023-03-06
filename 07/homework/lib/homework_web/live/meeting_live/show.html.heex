@@ -8,12 +8,16 @@
   </:actions>
 </.header>
 
-<.list>
-</.list>
+<.list></.list>
 
 <.back navigate={~p"/meetings"}>Back to meetings</.back>
 
-<.modal :if={@live_action == :edit} id="meeting-modal" show on_cancel={JS.patch(~p"/meetings/#{@meeting}")}>
+<.modal
+  :if={@live_action == :edit}
+  id="meeting-modal"
+  show
+  on_cancel={JS.patch(~p"/meetings/#{@meeting}")}
+>
   <.live_component
     module={HomeworkWeb.MeetingLive.FormComponent}
     id={@meeting.id}

@@ -5,6 +5,8 @@ defmodule Homework.Meetings.Meeting do
   alias Homework.Users.User
   alias Homework.Users
 
+  @type t :: %__MODULE__{}
+
   schema "meetings" do
     field :name, :string
     field :scheduled_at, :naive_datetime
@@ -20,6 +22,6 @@ defmodule Homework.Meetings.Meeting do
     meeting
     |> cast(attrs, [:name, :scheduled_at])
     |> cast_assoc(:user_meetings)
-    # |> validate_required([:name, :scheduled_at])
+    |> validate_required([:name, :scheduled_at])
   end
 end

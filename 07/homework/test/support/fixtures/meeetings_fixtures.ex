@@ -10,9 +10,7 @@ defmodule Homework.MeetingsFixtures do
   def meeting_fixture(attrs \\ %{}) do
     {:ok, meeting} =
       attrs
-      |> Enum.into(%{
-
-      })
+      |> Enum.into(%{})
       |> Homework.Meetings.create_meeting()
 
     meeting

@@ -7,7 +7,13 @@
   </:actions>
 </.header>
 
-<.simple_form for={@form} method="get" action={~p"/meetings/"} id="search-form" phx-submit="search">
+<.simple_form
+  for={@form}
+  method="get"
+  action={~p"/meetings/"}
+  id="search-form"
+  phx-submit="search"
+>
   <.input field={@form[:name]} type="text" label="Name" />
   <.input field={@form[:scheduled_at]} type="date" label="Scheduled at" />
   <:actions>
@@ -15,10 +21,10 @@
   </:actions>
 </.simple_form>
 
-  <%!-- row_click={fn {_id, meeting} -> JS.navigate(~p"/meetings/#{meeting}") end} --%>
-  <%!-- <:col :let={{_id, meeting}} label="Name"><%= meeting.name %></:col> --%>
-  <%!-- <:col :let={{_id, meeting}} label="Scheduled at"><%= meeting.scheduled_at %></:col> --%>
-  <%!-- <:col :let={{_id, meeting}} label="Invited users"> --%>
+<%!-- row_click={fn {_id, meeting} -> JS.navigate(~p"/meetings/#{meeting}") end} --%>
+<%!-- <:col :let={{_id, meeting}} label="Name"><%= meeting.name %></:col> --%>
+<%!-- <:col :let={{_id, meeting}} label="Scheduled at"><%= meeting.scheduled_at %></:col> --%>
+<%!-- <:col :let={{_id, meeting}} label="Invited users"> --%>
 
 <.table
   id="meetings"
@@ -27,7 +33,7 @@
 >
   <:col :let={meeting} label="Name"><%= meeting.name %></:col>
   <:col :let={meeting} label="Scheduled at"><%= meeting.scheduled_at %></:col>
-  <:col :let={ meeting} label="Invited users">
+  <:col :let={meeting} label="Invited users">
     <%= Enum.map_join(meeting.users, ",", & &1.username) %>
   </:col>
   <:action :let={meeting}>
