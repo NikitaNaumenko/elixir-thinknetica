@@ -13,9 +13,4 @@ defmodule Homework.Currencies.Currency do
     field :to, :string
     field :rate, :float
   end
-
-  def changeset(currency, params) do
-    currency
-    |> cast(params, [:from, :to])
-  end
 end
